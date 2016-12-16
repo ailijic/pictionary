@@ -1,0 +1,23 @@
+{
+  "name": "pictionary",
+  "version": "1.0.0",
+  "description": "pictionary game",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailijic/pictionary.git"
+  },
+  "author": "ailijic",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ailijic/pictionary/issues"
+  },
+  "homepage": "https://github.com/ailijic/pictionary#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.7.2"
+  }
+}
