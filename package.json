@@ -2,7 +2,7 @@
   "name": "pictionary",
   "version": "1.0.0",
   "description": "pictionary game",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
     "test": "mocha"
   },

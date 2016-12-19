@@ -14,17 +14,19 @@ function start () {
   const server = http.Server(app)
   const io = socketIO(server)
 
+  let answer = NaN
   io.on('connection', (socket) => {
     const newUser = userList.add(socket.id)
     console.log(userList)  // DELETE LATER
     userList.clients = socket.server.eio.clientsCount
     io.emit('numUsers', userList.clients)
-    socket.emit(newUser.action(), newUser.action())
+    socket.emit(newUser.action, JSON.stringify(newUser))
 
     socket.on('disconnect', () => {
       userList.clients = socket.server.eio.clientsCount
       io.emit('numUsers', userList.clients)
       userList.disconnect(socket.id)
+
       console.log(userList)  // DELETE LATER
     })
 
@@ -33,7 +35,26 @@ function start () {
     })
 
     socket.on('guess', (guess) => {
-      socket.broadcast.emit('guess', guess)
+      io.emit('guess', guess)
+      if (guess === answer) {
+        let id = NaN
+        let index = NaN
+        userList.forEach((obj, ind) => {
+          if (obj.action === Drawer()) {
+            id = obj.id
+            index = ind
+          }
+        })
+        userList[index].action = Guesser()
+        io.to(id).emit(Guesser(), JSON.stringify(userList[index]))
+
+        newUser.action = Drawer()
+        socket.emit('drawer', JSON.stringify(newUser))
+      }
+    })
+
+    socket.on('answer', (word) => {
+      answer = word
     })
   })
 
@@ -42,10 +63,11 @@ function start () {
   // Create User Class
   function User (id) {
     this.id = id
+    // no  forEach, first user is drawer
     if (userList.hasDrawer()) {
-      this.action = Guesser
+      this.action = Guesser()
     } else {
-      this.action = Drawer
+      this.action = Drawer()
     }
   }
   function Drawer () {
@@ -73,17 +95,22 @@ function start () {
   userList.hasDrawer = () => {
     return userList.reduce(hasDrawer, false)
     function hasDrawer (prev, obj) {
-      if (obj.action === Drawer) {
+      if (obj.action === Drawer()) {
         return true
       } else { return prev }
     }
   }
   userList.disconnect = (id) => {
     const index = userList.indexOf(id)
-    if (userList[index].action === Drawer && userList.length >= 2) {
+    if (userList[index].action === Drawer() && userList.length >= 2) {
+      console.log('Removing Drawer')
       userList.remove(id)
-      userList[0].action = Drawer
+      userList[0].action = Drawer()
+      console.log(io.clients)
+      io.to(userList[0].id).emit(userList[0].action,
+          JSON.stringify(userList[0]))
     } else {
+      console.log('just remove')
       userList.remove(id)
     }
   }

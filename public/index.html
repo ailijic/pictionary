@@ -22,7 +22,7 @@ h1 {
     text-align: center;
 }
 
-#top-message {
+#top-message, #users, #draw {
     text-align: center;
     padding: 10px;
 }
@@ -45,10 +45,10 @@ canvas {
 <div id="main">
     <h1> Pictionary </h1>
     <canvas id="canvas"></canvas>
+    <div id = "users"></div>
     <div id = "top-message">
-        <div id = "guess">
-            Make a guess: <input type = "text">
-            <ul id = "guessList" style="list-style-type:none"> </ul>
-        </div>
+        <ul id = "guessList" style="list-style-type:none">
+            Guesses:
+        </ul>
     </div>
-</div>
+</canvas>
