@@ -15,10 +15,11 @@ function start () {
   const io = socketIO(server)
 
   io.on('connection', (socket) => {
-    userList.add(socket.id)
+    const newUser = userList.add(socket.id)
     console.log(userList)  // DELETE LATER
     userList.clients = socket.server.eio.clientsCount
     io.emit('numUsers', userList.clients)
+    socket.emit(newUser.action(), newUser.action())
 
     socket.on('disconnect', () => {
       userList.clients = socket.server.eio.clientsCount
@@ -48,12 +49,18 @@ function start () {
     }
   }
   function Drawer () {
+    return 'drawer'
   }
   function Guesser () {
+    return 'guesser'
   }
   var userList = []
   userList.clients = 0
-  userList.add = (id) => { userList.push(new User(id)) }
+  userList.add = (id) => {
+    const newUser = new User(id)
+    userList.push(newUser)
+    return newUser
+  }
   userList.remove = (id) => { userList.splice(userList.indexOf(id), 1) }
   userList.indexOf = (id) => {
     return userList.reduce(ifId, NaN)
