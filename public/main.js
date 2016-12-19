@@ -5,6 +5,9 @@ start()
 function start () {
   'use strict'
 
+  let Player = {}
+
+
   $(document).ready(() => { pictionary() })
   function pictionary () {
     const socket = io()
@@ -12,6 +15,12 @@ function start () {
     const context = canvas[0].getContext('2d')
     canvas[0].width = canvas[0].offsetWidth
     canvas[0].height = canvas[0].offsetHeight
+
+    let numUsers = 0
+    let userElement = template`<div class = 'numUsers'> 
+                        Users Connected: ${0}
+                        </div>`
+    $('#top-message').prepend(userElement(numUsers))
 
     // Local Events
     let drawing = false
@@ -41,6 +50,10 @@ function start () {
       $('#guessList').prepend(`<li>${guess}</li>`)
     })
 
+    socket.on('numUsers', (numUsers) => {
+      $('div.numUsers').replaceWith(userElement(numUsers))
+    })
+
     socket.on('draw', (position) => {
       draw(position)
     })
@@ -52,6 +65,7 @@ function start () {
       context.fill()
     }
 
+    // Guessing Logic
     const guessBox = $('#guess input')
     guessBox.on('keydown', onKeyDown)
     function onKeyDown (event) {
@@ -62,6 +76,18 @@ function start () {
       console.log(guessBox.val())
       socket.emit('guess', guessBox.val())
       guessBox.val('')
+    }
+  }
+
+  function template (strings, ...keys) {
+    return function (...values) {
+      var dict = values[values.length - 1] || {}
+      var result = [strings[0]]
+      keys.forEach(function (key, i) {
+        var value = Number.isInteger(key) ? values[key] : dict[key]
+        result.push(value, strings[i + 1])
+      })
+      return result.join('')
     }
   }
 
